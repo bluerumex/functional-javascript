@@ -32,11 +32,11 @@ let users  = [
     // 2.1 _filter
     function _filter(list, predi) {
         var new_list = [];
-        for (var i = 0; i < list.length; i++) {
-            if (predi(list[i])) {
-                new_list.push(list[i]);
+        _each(list, function(val) {
+            if (predi(val)) {
+                new_list.push(val);
             }
-        }
+        })
         return new_list;
     }
     
@@ -48,9 +48,9 @@ let users  = [
     // 2.2 _map
     function _map(list, mapper) {
         var new_list = [];
-        for (var i = 0; i < list.length; i++) {
-            new_list.push(mapper(list[i]));
-        }
+        _each(list, function(val) {
+            new_list.push(mapper(val));
+        })
         return new_list;
     }
 
