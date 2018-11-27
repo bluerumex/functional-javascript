@@ -64,5 +64,93 @@ let users  = [
 
     let over_30_names = _map(over_30, user => user.name);
     let under_30_ages = _map(under_30, user => user.age);
-    console.log(over_30_names);
-    console.log(under_30_ages);
+    // console.log(over_30_names);
+    // console.log(under_30_ages);
+
+    console.log(
+        _map(
+            _filter(users, user => user.age >= 30),
+            user => user.age
+        )
+    );
+
+// 3. _curry, _curryr
+    // 3.1 _curry
+    function _curry(fn) {
+        return function(a) {
+            return function(b) {
+                return fn(a, b);
+            }
+        }
+    }
+
+    // 3.1 _curry 첫번째 함수에서 arguments가 둘 이상 들어올 경우
+    function _curry2(fn) {
+        return function(a, b) {
+            return arguments.length == 2 ? 
+                 fn(a, b) : 
+                 function(b) { return fn(a, b) }
+        }
+    }
+    
+    
+    function _curryr(fn) {
+        return function(a, b) {
+            return arguments.length == 2 ? 
+                fn(a, b) : 
+                function(b) { return fn(b, a) }
+        }
+    }
+
+    let addCurry = _curry(function(a, b) {
+        return a + b;
+    });
+
+    let add5 = addCurry(5);
+    console.log(add5(5));
+
+    let sub = _curryr(function(a, b) {
+        return a - b;
+    });
+
+    let sub10 = sub(10);
+    console.log(sub10(5));
+
+    // 3.2 _get을 만들어 좀 더 편하게 하기
+    /* 
+    function _get(obj, key) {
+        return obj == null ? undefined : obj[key];
+    }
+
+    let user1 = users[0];
+    console.log(user1.name);
+    console.log(_get(user1, 'name'));
+    */
+   
+    let _get = _curryr(function(obj, key) {
+       return obj == null ? undefined : obj[key];
+    });
+    
+    let user1 = users[0];
+    console.log(_get('name')(user1));
+
+    console.log(`_get: ${_get('name')}`);
+
+    // _get을 이용해 더 간결하게
+    console.log(
+        _map(
+            _filter(users, user => user.age >= 30),
+            // user => user.age
+            // function(user) { return user.age }
+            _get('name')
+        )
+    );
+
+    console.log(
+        _map(
+            _filter(users, user => user.age >= 30),
+            // user => user.age
+            // function(user) { return user.age }
+            _get('age'),
+        )
+    );
