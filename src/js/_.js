@@ -1,11 +1,11 @@
 // 2.1 _filter
-function _filter(list, predi) {
+function _filter(list, predifn) {
     var new_list = [];
     _each(list, function(val) {
-        if (predi(val)) {
+        if (predifn(val)) {
             new_list.push(val);
         }
-    })
+    });
     return new_list;
 }
 
