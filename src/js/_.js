@@ -1,3 +1,4 @@
+/* 
 let users  = [
     {id:1, name:'ID', age:36},
     {id:2, name:'BJ', age:32},
@@ -8,7 +9,7 @@ let users  = [
     {id:7, name:'JI', age:31},
     {id:8, name:'MP', age:23}
 ];
-
+*/
 
 // 2.1 _filter
 function _filter(list, predfn) {
@@ -118,3 +119,31 @@ function _go(arg) {
 // _filter, _map에 _curryr 적용
 var _filter = _curryr(_filter),
     _map = _curryr(_map);
+
+//------------------- chapter collection -------------------//
+
+// _values
+var _values = _map(_identity); // _map은 현재 _curryr로 구현
+
+function _identity(val) {
+    return val;
+}
+
+// _pluck
+function _pluck(data, key) {
+    return _map(data, _get(key));
+}
+
+// _reject
+function _negate(func) {
+    return function(val) {
+        return !func(val);
+    }
+}
+
+function _reject(data, predi) {
+    return _filter(data, _negate(predi));
+}
+
+// _compact (true 한 값을 남김)
+var _compact = _filter(_identity);
