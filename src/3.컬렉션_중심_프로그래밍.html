@@ -8,6 +8,7 @@
     <script src="./js/_.js"></script>
 </head>
 <body>
+    <h5>open console</h5>
 <script>
 // 컬렉션 중심 프로그래밍의 4가지 유형과 함수
 
@@ -136,8 +137,16 @@ let users  = [
         }
         return -1;
     });
-    // 3.3 some
-    // 3.4 every
+    
+    // 3.3 some (조건에 맞는 값이 하나라도 있을경우 true)
+    function _some(data, predi) {
+        return _find_index(data, predi || _identity) != -1;
+    }
+
+    // 3.4 every (조건에 모든 값이 true일 경우 true)
+    function _every(data, predi) {
+        return _find_index(data, _negate(predi || _identity)) == -1;
+    }
 
     // --------------------- func test --------------------- //
     
@@ -167,11 +176,107 @@ let users  = [
         _get('name'),
         console.log
     );
+
+    console.log(
+        `_some fn: `,
+        _some([1,2,4,10,20], function(val) {
+            return val > 10;
+        })
+    );
     
+    console.log(
+        _some([1,2,3,4])
+    );
+
+    console.clear();
+
     // 4. 접기 - reduce
     // 4.1 min, max, min_by, max_by
+    // 최소값 찾기
+    function _min(data) {
+        return _reduce(data, function(a, b) {
+            return a < b ? a : b;
+        })
+    }
+   
+    // 최대값 찾기
+    function _max(data) {
+        return _reduce(data, function(a, b) {
+            return a > b ? a : b;
+        })
+    }
+
+    function _min_by(data, iter) {
+        return _reduce(data, function(a, b) {
+            return iter(a) < iter(b) ? a : b;
+        })
+    }
+
+    function _max_by(data, iter) {
+        return _reduce(data, function(a, b) {
+            return iter(a) > iter(b) ? a : b;
+        })
+    }
+
+    var _min_by = _curryr(_min_by),
+        _max_by = _curryr(_max_by);
+
     // 4.2 group_by, push
+
+    function _push(obj, key, val) {
+        (obj[key] = obj[key] || []).push(val);
+        return obj;
+    }
+
+    var _group_by = _curryr(function(data, iter) {
+        return _reduce(data, function(grouped, val) {
+            return _push(grouped, iter(val), val);
+        }, {});
+    });
+
     // 4.3 count_by, inc
+
+    var _inc= function(count, key) {
+        count[key] = count[key] ? count[key]++ : 1;
+        return count;
+    }
+
+    var _count_by = _curryr(function(data, iter) {
+        return _reduce(data, function(count, val) {
+            return _inc(count, iter(val));
+        }, {})
+    });
+
+    // --------------------- func test --------------------- //
+    
+    console.log(
+        `_min fn: `,
+        _min([1,2,3,4,5])
+    );
+
+    console.log(
+        `_min_by: `,
+        _min_by([1,2,4,10,5,-4], Math.abs)
+    );
+
+    console.log(
+        _max_by(users, function(user) {
+            return user.age;
+        })
+    );
+
+    _go(users,
+        _filter(user => user.age >= 30),
+        _min_by(_get('age')),
+        console.log
+    );
+
+    _go(users,
+        _group_by(function(user) {
+            return user.age;
+        }),
+        console.log
+    );
     </script>
 </body>
 </html>
