@@ -1,366 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
 </head>
+
 <body>
-    <h4>functional programming</h4>
-    <h5>open console mode</h5>
-<script>
+  <h4>functional programming</h4>
+  <h5>open console mode</h5>
+  <script>
+    let users  = [
+      {id:1, name:'ID', age:36},
+      {id:2, name:'BJ', age:32},
+      {id:3, name:'JM', age:32},
+      {id:4, name:'PJ', age:27},
+      {id:5, name:'HA', age:25},
+      {id:6, name:'JE', age:26},
+      {id:7, name:'JI', age:31},
+      {id:8, name:'MP', age:23}
+  ];
 
-let users  = [
-    {id:1, name:'ID', age:36},
-    {id:2, name:'BJ', age:32},
-    {id:3, name:'JM', age:32},
-    {id:4, name:'PJ', age:27},
-    {id:5, name:'HA', age:25},
-    {id:6, name:'JE', age:26},
-    {id:7, name:'JI', age:31},
-    {id:8, name:'MP', age:23}
-];
-
-// 1. 명령형 코드
+    // 1. 명령형 코드
     // 1.1 age가 30 이상인 users를 거른다.
     let temp_users = [];
     for (var i = 0; i < users.length; i++) {
-        if (users[i].age >= 30) {
-            temp_users.push(users[i]);
-        }
+      if (users[i].age >= 30) {
+        temp_users.push(users[i]);
+      }
     }
     console.log(`명령형으로 추출(age >= 30) users: `, temp_users);
-    
+
     // 1.2 age가 30 이상인 user의 name을 수집한다.
     let temp_users_names = [];
     for (var i = 0; i < users.length; i++) {
-        if (users[i].age >= 30) {
-            temp_users_names.push(users[i].name);
-        }
+      if (users[i].age >= 30) {
+        temp_users_names.push(users[i].name);
+      }
     }
     console.log(`명령형으로 추출(age >= 30) names: `, temp_users_names);
 
     console.clear();
 
-// 2. _filter, _map으로 리팩토링
+    // 2. _filter, _map으로 리팩토링
     // 2.1 _filter
-    function _filter(list, predfn) {
-        var new_list = [];
-        _each(list, function(val) {
-            if (predfn(val)) {
-                new_list.push(val);
-            }
-        });
-
-        return new_list;
-    }
-    
-    // 2.2 _map
-    function _map(list, mapperfn) {
-        var new_list = [];
-        _each(list, function(val) {
-            new_list.push(mapperfn(val))
-        });
-
-        return new_list;
-    }
-    
-    // 2.3 _each
-    var _get = _curryr(function(obj, key) {
-        return obj == null ? undefined : obj[key];
-    });
-
-    function _is_object(obj) {
-        return typeof obj == 'object' && !!obj;
-    }
-
-    function _keys(obj) {
-        return _is_object(obj) ? Object.keys(obj) : [];
-    }
-
-    var _length = _get('length');
-
-    function _each(list, iterfn) {
-        var keys = _keys(list);
-        for (var i = 0, len = keys.length; i < len; i++) {
-            iterfn(list[keys[i]]);
+    function _filter(list, predi) {
+      var new_list = [];
+      _each(list, function (val) {
+        if (predi(val)) {
+          new_list.push(val);
         }
-        return list;
-    };
+      });
+      return new_list;
+    }
+
+    // 2.2 _map
+    function _map(list, mapper) {
+      var new_list = [];
+      _each(list, function (val) {
+        new_list.push(mapper(val));
+      });
+      return new_list;
+    }
+
+    // 2.3 _each
+    function _each(list, iter) {
+      for (var i = 0; i < list.length; i++) {
+        iter(list[i]);
+      }
+      return list;
+    }
 
     // --------------------- func test --------------------- //
-
+    /*
     console.log(
-        `_filter fn age >= 30`,
-        _filter(users, function(user) {
-            return user.age >= 30
-        })
+      `_filter test`,
+      '\n',
+      _filter(users, function (user) {
+        return user.age >= 30;
+      })
     );
 
-    var age30over = _filter(users, function(user) {
-        return user.age >= 30
-    });
-
     console.log(
-        `age >= 30 names:`,
-        _map(age30over, function(user) {
-            return user.name;
-        })
+      `mapper test`,
+      '\n',
+      _map(users, function (user) {
+        return user.name;
+      })
     );
-    
-    console.log(
-        `_map fn: `,
-        _map(
-            _filter(users, function(user) {
-                return user.age >= 30;
-            }),
-            function(user) {
-                return user.name;
-            }
-        )
-    );
+    */
 
-// 3. _curry, _curryr
+    // 3. _curry, _curryr
     // 3.1 _curry
     function _curry(fn) {
-        return function(a, b) {
-            return arguments.length == 2 ? 
-                fn(a, b) :
-                function(b) {
-                    return fn(a, b);
-                }
+      return function (a) {
+        return arguments.length == 2 ?
+         fn(a ,b) :
+         function (b) {
+          return fn(a, b);
         }
-    };
-        
+      }
+    }
+
     // 3.2 _curryr
     function _curryr(fn) {
-        return function(a, b) {
-            return arguments.length == 2 ? 
-                fn(a, b) :
-                function(b) {
-                    return fn(b, a);
-                }
+      return function (a) {
+        return arguments.length == 2 ?
+          fn(b, a) :
+          function (b) {
+            return fn(b, a);
         }
+      }
     }
 
     // 3.3 _get
-    /*
     function _get(obj, key) {
-        return obj == null ? undefined : obj[key];
+      return obj == null ? undefined : obj[key];
     }
-    */
-    
+
     // _get의 표현력을 키우기 위해 _curryr 적용
-    var _get = _curryr(function(obj, key) {
-        return obj == null ? undefined : obj[key];
-    });
+    var _get = _curryr(_get);
 
     // --------------------- func test --------------------- //
 
-    var add = _curry(function(a, b) {
-        return a + b;
+    /* 
+    var add = _curry(function (a, b) {
+      return a + b;
     });
 
-    console.log( add(20, 5) );
+    console.log(add(20)(5));
 
-    var sub = _curryr(function(a, b) {
-        return a - b;
+    var sub = _curryr(function (a, b) {
+      return a - b;
     });
-
-    var add10 = add(10);
-    console.log( add10(5) );
-    console.log( add(10, 30) );
-
-    var sub10 = sub(10);
-    console.log( sub10(5) );
-    console.log( sub(100, 10) );
 
     var getName = _get('name');
-    console.log (
-        `getName test: `,
-        getName(users[1])
+    console.log(`getName`,
+      getName(users[1])
     );
+
+    console.log(sub(10)(5));
 
     // -> _get(user, 'name')
     console.log(
-        `_map fn: `,
-        _map(
-            _filter(users, function(user) {
-                return user.age >= 30;
-            }),
-            _get('name')
-        )
+      `_map fn: `,
+      _map(
+        _filter(users, function (user) {
+          return user.age >= 30;
+        }),
+        _get('name')
+      )
     );
+    */
 
-    console.clear();
+    //console.clear();
 
-// 4. _reduce
+    // 4. _reduce
     // 4.1 _reduce
-    function _reduce(list, iterfn, memo) {
-        if (arguments.length == 2) {
-            memo = list[0];
-            list = _rest(list);
-        }
-        _each(list, function(val) {
-            memo = iterfn(memo, val)
-            // memo: accmulator
-            // val: currentValue
-        })
-        
-        return memo;
+    function _reduce(list, iter, memo) {
+      if (arguments.length == 2) {
+        memo = list[0];
+        list = _rest(list);
+      }
+      _each(list, function(val) {
+        memo = iter(memo, val);
+      })
+      return memo;
     }
 
     // 4.2 _rest
     var slice = Array.prototype.slice;
+
     function _rest(list, num) {
-        return slice.call(list, num || 1);
+      return slice.call(list, num || 1);
     }
 
     // --------------------- func test --------------------- //
-
-    console.log(
-        `reduce fn: `,
-        _reduce(
-            [1,2,3,4,5,6],
-            function(a, c) { return a + c; }
-        )
-    );
 
     console.clear();
 
-// 5. pipeline
+    // 5. pipeline
     // 5.1 _pipe
     function _pipe() {
-        var fns = arguments;
-        return function(arg) {
-            return _reduce(fns, function(arg, fn) {
-                return fn(arg);
-            }, arg);
-        }
-    };
+      var fns = arguments;
+      return function(arg) {
+        return _reduce(fns, function(arg, fn) {
+          return fn(arg);
+        }, arg);
+      }
+    }
+
+    console.log(
+      _pipe(
+        function(a) { return a + 1 },
+        function(a) { return a + a }
+      )(1)
+    );
 
     // 5.2 _go 
     // _pipe의 즉시 실행 버전
-    function _go(arg) {
-        var fns = _rest(arguments);
-        return _pipe.apply(null, fns)(arg);
-    }
-    
+
     // --------------------- func test --------------------- //
-    
-    console.log(
-        `기존 _map fn`,
-        _map([1,2,3], function(val) {
-            return val * 2;
-        })
-    );
-    
+
     // _filter, _map에 _curryr 적용
     var _filter = _curryr(_filter),
-        _map = _curryr(_map);
+      _map = _curryr(_map);
 
     console.log(
-        _map(function(val) {
-            return val * 2
-        })([1,2,3])
+      _map(function (val) {
+        return val * 2
+      })([1, 2, 3])
     );
 
     // --------------------- func test --------------------- //
-    
-    console.log(
-        `_pipe fn: `,
-        _pipe(
-            function(val) { return val + 1 },
-            function(val) { return val * 2 },
-        )(1)
-    );
-    
-    _go(
-        users,
-        _filter(function(user) {
-            return user.age < 30;
-        }),
-        _map(_get('name')),
-        console.log
-        );
-        
-    _go(
-        users,
-        function(users) {
-            return _filter(users, function(user) {
-                return user.age >= 30;
-            })
-        },
-        function(users) {
-            return _map(users, _get('name'))
-        },
-        console.log
-        );
-        
-        console.log(
-            `_map fn: `,
-            _map(
-            _filter(users, function(user) {
-                return user.age >= 30;
-            }),
-            _get('name')
-            )
-    );
-    
-    // console.clear();
-    
-// 6. _each의 다형성 높이기
-    // 6.1 _each 
-    /*
-    var _length = _get('length');
 
-    function _each(list, iterfn) {
-        for (var i = 0, len = _get('lenth')(list); i < len; i++) {
-            iterfn(list[i]);
-        }
-        return list;
-    };
-    */
+    console.log(
+      `_pipe fn: `,
+      _pipe(
+        function (val) {
+          return val + 1
+        },
+        function (val) {
+          return val * 2
+        },
+      )(1)
+    );
+
+    _go(
+      users,
+      _filter(function (user) {
+        return user.age < 30;
+      }),
+      _map(_get('name')),
+      console.log
+    );
+
+    _go(
+      users,
+      function (users) {
+        return _filter(users, function (user) {
+          return user.age >= 30;
+        })
+      },
+      function (users) {
+        return _map(users, _get('name'))
+      },
+      console.log
+    );
+
+    console.log(
+      `_map fn: `,
+      _map(
+        _filter(users, function (user) {
+          return user.age >= 30;
+        }),
+        _get('name')
+      )
+    );
+
+    // console.clear();
+
+    // 6. _each의 다형성 높이기
+    // 6.1 _each 
 
     // 6.2 _keys로 each 다형성 높이기
-    /*
-    function _is_object(obj) {
-        return typeof obj == 'object' && !!obj;
-    }
 
-    function _keys(obj) {
-        return _is_object(obj) ? Object.keys(obj) : [];
-    }
-    */
-   
     // --------------------- func test --------------------- //
-   
-   _each(null, console.log);
 
-   console.log( _keys({ name: 'ID', age: 33 }) );
-   console.log( _keys([1,2,3,4,5]) );
-   console.log( _keys(10) );
-   console.log( _keys(null) );
+    _each(null, console.log);
 
-   _each({
-       13: 'ID',
-       19: 'HD',
-       29: 'YD'
-   }, function(name) {
-       console.log(name)
-   });
+    console.log(_keys({
+      name: 'ID',
+      age: 33
+    }));
+    console.log(_keys([1, 2, 3, 4, 5]));
+    console.log(_keys(10));
+    console.log(_keys(null));
 
-   _go({
-       1: users[0],
-       3: users[2],
-       5: users[4]
-    },
-    _map(function(user) {
+    _each({
+      13: 'ID',
+      19: 'HD',
+      29: 'YD'
+    }, function (name) {
+      console.log(name)
+    });
+
+    _go({
+        1: users[0],
+        3: users[2],
+        5: users[4]
+      },
+      _map(function (user) {
         return user.name.toLowerCase();
-    }),
-    console.log
-   );
-</script>
+      }),
+      console.log
+    );
+  </script>
 </body>
+
 </html>
