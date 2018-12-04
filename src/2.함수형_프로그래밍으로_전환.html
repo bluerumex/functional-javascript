@@ -67,10 +67,11 @@
 
     // 2.3 _each
     function _each(list, iter) {
-      for (var i = 0; i < list.length; i++) {
-        iter(list[i]);
+      var keys = _keys(list);
+      for (var i = 0, len = keys.length; i < len; i++) {
+        iter(list[keys[i]], keys[i]);
       }
-      return list;
+    return list;
     }
 
     // --------------------- func test --------------------- //
@@ -95,7 +96,7 @@
     // 3. _curry, _curryr
     // 3.1 _curry
     function _curry(fn) {
-      return function (a) {
+      return function (a, b) {
         return arguments.length == 2 ?
          fn(a ,b) :
          function (b) {
@@ -106,9 +107,9 @@
 
     // 3.2 _curryr
     function _curryr(fn) {
-      return function (a) {
+      return function (a, b) {
         return arguments.length == 2 ?
-          fn(b, a) :
+          fn(a, b) :
           function (b) {
             return fn(b, a);
         }
@@ -192,15 +193,12 @@
       }
     }
 
-    console.log(
-      _pipe(
-        function(a) { return a + 1 },
-        function(a) { return a + a }
-      )(1)
-    );
-
     // 5.2 _go 
     // _pipe의 즉시 실행 버전
+    function _go(arg) {
+      var fns = _rest(arguments);
+      return _pipe.apply(null, fns)(arg);
+    }
 
     // --------------------- func test --------------------- //
 
@@ -266,6 +264,10 @@
     // 6.1 _each 
 
     // 6.2 _keys로 each 다형성 높이기
+    function _keys(obj) {
+      return obj == null ? [] : Object.keys(obj);
+    }
+
 
     // --------------------- func test --------------------- //
 

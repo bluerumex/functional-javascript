@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>console timer</title>
+</head>
+<body>
+  <h1>console mode</h1>
+<script>
+setInterval(logClockTime, 10000 * 1000);
+
+function logClockTime() {
+    // 현재 시각을 사용시로 표현하는 문자열을 얻는다.
+    var time = getClockTime();
+
+    // 콘솔을 지우고 시간을 로그에 남긴다.
+    console.clear();
+    console.log(time);
+}
+
+function getClockTime() {
+    // 현재 시각을 얻는다.
+    var date = new Date();
+    var time = '';
+
+    // 시각을 직렬화한다.
+    var time = {
+        hours: date.getHours(),
+        minutes: date.getMinutes(),
+        seconds: date.getSeconds(),
+        appm: 'AM'
+    }
+
+    // 상용시로 변환한다.
+    if (time.hours == 12) {
+        time.appm = 'PM';
+    } else if (time.hours > 12) {
+        time.appm = 'PM'
+        time.hours -= 12;
+    }
+
+    // 시간을 2글자로 만들기 위해 앞에 0을 붙인다.
+    if (time.hours < 10) {
+        time.hours = '0' + time.hours;
+    }
+
+    // 분을 2글자로 만들기 위해 앞을 0을 붙인다.
+    if (time.minutes < 10) {
+        time.minutes = '0' + time.minutes;
+    }
+
+    // 초을 2글자로 만들기 위해 앞을 0을 붙인다.
+    if (time.seconds < 10) {
+        time.seconds = '0' + time.seconds;
+    }
+    
+    // 'hh:mm:ss tt' 형식의 문자열을 만든다.
+    return time.hours + ':' + time.minutes + ':' + time.seconds+ ':' + time.appm;
+}
+
+// 함수형을 변환
+/*
+const compose = (...fns) =>
+(arg) =>
+fns.reduce(
+  (compose, f) => f(compose),
+  arg
+  );
+*/
+const compose = function(...fns) {
+  return function(arg) {
+    return fns.reduce(
+      function(compose, f) {
+        return f(compose);
+      },
+      arg
+    );
+  }
+}
+
+const oneSecond = () => 1000;
+const getCurrentTime = () => new Date();
+const clear = () => console.clear();
+const log = message => console.log(message);
+
+// Date 객체를 받아서 24시간 시각을 반환한다.
+const abstractClockTime = date => ({
+  hours: date.getHours(),
+  minutes: date.getMinutes(),
+  seconds: date.getSeconds()
+});
+
+// 24시간 시각을 받아서 상용시로 변환.
+const civilianHours = clockTime => ({
+  ...clockTime,
+  hours: (clockTime.hours > 12) ? clockTime.hours - 12 : clockTime.hours
+});
+
+// 시각에 맞는 AM, PM을 붙여준다.
+const appendAPM = clockTime => ({
+  ...clockTime,
+  ampm: (clockTime.hours >= 12) ? 'PM' : 'AM'
+});
+
+// 고차 함수
+const display = function(target) {
+  return function(time) {
+    return target(time);
+  }
+}
+
+const formatClock = function(format) {
+  return function(time) {
+    return format
+      .replace('hh', time.hours)
+      .replace('mm', time.minutes)
+      .replace('ss', time.seconds)
+      .replace('tt', time.ampm)
+  }
+}
+
+const prependZero = function(key) {
+  return function(clockTime) {
+    return ({
+      ...clockTime,
+      [key]: (clockTime[key] < 10) ? '0' + clockTime[key] : clockTime[key]
+    });
+  }
+}
+
+const covertToCivilianTime = function(clockTime) {
+  return compose(
+    appendAPM,
+    civilianHours
+  )(clockTime);
+}
+
+const doubleDigits = function(civilianTime) {
+  return compose(
+    prependZero('hours'),
+    prependZero('minutes'),
+    prependZero('seconds')
+  )(civilianTime);
+}
+
+const startTicking = function() {
+  setInterval(
+    compose(
+      clear,
+      getCurrentTime,
+      abstractClockTime,
+      covertToCivilianTime,
+      doubleDigits,
+      formatClock('hh:mm:ss tt'),
+      display(log)
+    )
+  ,
+  oneSecond());
+}
+
+startTicking();
+
+</script>
+</body>
+</html>

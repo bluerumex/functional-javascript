@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sample#2</title>
+</head>
+<body>
+  <h1>console mode</h1>
+<script>
+
+const _filter = (list, fred) => {
+  let len = list.length,
+    new_list = new Array(len);
+
+  for (let i = 0; i < len; i++) {
+    if (fred(list[i])) {
+      new_list.push(list[i])
+    }
+  }
+
+  return new_list;
+}
+
+const _map = (list, mapper) => {
+  let len = list.length,
+    new_list = new Array(len);
+  
+  for (let i = 0; i < len; i++) {
+    new_list.push(mapper([list[i]]));
+  }
+}
+
+const _callApi = () => {
+  // fetch -> promise object return 
+  return fetch('https://randomuser.me/api/?results=10')
+    .then(res => res.json())
+    .then(json => json.results)
+    .catch(err => console.log(err));
+}
+
+const data = _callApi();
+
+console.log(
+  data
+);
+
+
+
+</script>
+</body>
+</html>
