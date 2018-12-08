@@ -220,7 +220,7 @@ _.map = function(list, iter) {
     new_list.push(iter(list[i], i, list));
   }
   return new_list;
-}
+};
 
 _.filter = function(list, predi) {
   let new_list = [];
@@ -230,7 +230,7 @@ _.filter = function(list, predi) {
     }
   }
   return new_list;
-}
+};
 
 _.find = function(list, predi) {
   for (let i = 0, len = list.length; i < len; i++) {
@@ -238,7 +238,7 @@ _.find = function(list, predi) {
       return list[i];
     }
   }
-}
+};
 
 _.findIdnex = function(list, predi) {
   for (let i = 0, len = list.length; i < len; i++) {
@@ -247,13 +247,88 @@ _.findIdnex = function(list, predi) {
     }
   }
   return -1;
-}
+};
 
 console.log(
   _.filter([1,2,3,4], function(val, idx) {
     return idx > 1;
   })
-)
+);
+
+_.identity = function(v) {
+  return v;
+};
+
+_.some = function(list) {
+  return !! _.find(list, _.identity);
+};
+
+_.every = function(list) {
+  // return _.filter(list, _.identity).length == list.length;
+  return _beq(-1)(_.findIdnex(list, _not))
+}
+
+function _not(v) { return !v; }
+function _beq(a) {
+  return function(b) {
+    return a === b;
+  }
+}
+
+function _positive(list) {
+  return _.find(list, _.identity);
+}
+
+function _negativeIndex(list) {
+  return _.findIdnex(list, not);
+}
+
+console.log(
+  _.identity(10)
+);
+
+console.log(
+  _.some([0, null, 2])
+);
+
+console.log(
+  _.some([0, null, 2]),
+  _.some([0, null, false]),
+  _.every([0, null, 2]),
+  _.every([{}, true, 2])
+);
+
+
+// UnderScore.js 중
+_.compose = function() {
+  var args = arguments;
+  // args -> greet, exclaim
+  var start = args.length - 1;
+  // start -> 1
+  return function() {
+    // arguments = 'JS'
+    var i = start;
+    // result -> exclaim('JS');
+    var result = args[start].apply(this, arguments);
+    while (i--) {
+      // i -> 0
+      // result -> great('JS');
+      result = args[i].call(this, result);
+    }
+    return result;
+  }
+};
+
+let greet = function(name) {
+  return `hi: ${name}`;
+}
+
+let exclaim = function(statement) {
+  return statement.toUpperCase() + "!";
+}
+
+let welcome = _.compose(greet, exclaim);
+console.log( welcome('JS') );
 
 </script>
 </body>
