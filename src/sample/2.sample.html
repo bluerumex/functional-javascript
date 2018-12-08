@@ -10,7 +10,22 @@
   <h1>console mode</h1>
 <script>
 
-const _filter = (list, fred) => {
+let _data = _getUsers();
+
+function _callApi() {
+  // fetch -> promise object return 
+  return fetch('https://randomuser.me/api/?results=10')
+    .then(res => res.json())
+    .then(json => json.results)
+    .catch(err => console.log(err))
+}
+
+async function _getUsers() {
+  const users = await this._callApi();
+  _data = users;
+};
+
+function _filter(list, fred) {
   let len = list.length,
     new_list = new Array(len);
 
@@ -23,7 +38,7 @@ const _filter = (list, fred) => {
   return new_list;
 }
 
-const _map = (list, mapper) => {
+function _map(list, mapper) {
   let len = list.length,
     new_list = new Array(len);
   
@@ -32,22 +47,10 @@ const _map = (list, mapper) => {
   }
 }
 
-const _callApi = () => {
-  // fetch -> promise object return 
-  return fetch('https://randomuser.me/api/?results=10')
-    .then(res => res.json())
-    .then(json => json.results)
-    .catch(err => console.log(err));
-}
-
-const data = _callApi();
-
-console.log(
-  data
-);
-
-
-
+let nats = 
+  _map(_data, function(user) {
+    return user.nat;
+  });
 </script>
 </body>
 </html>

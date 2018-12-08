@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>CH01</title>
+</head>
+<body>
+<h1>console mode</h1>
+<script>
+let users  = [
+  {id:1, name:'ID', age:32},
+  {id:2, name:'HA', age:25},
+  {id:3, name:'BJ', age:32},
+  {id:4, name:'PJ', age:28},
+  {id:5, name:'JE', age:27},
+  {id:6, name:'JM', age:32},
+  {id:7, name:'HI', age:24}
+];
+
+function _filter(list, predi) {
+  let new_list = [];
+  for (let i = 0; i < list.length; i++) {
+    if (predi(list[i])) {
+      new_list.push(list[i]);
+    } 
+  }
+  return new_list;
+}
+
+function _map(list, mapper) {
+  let new_list = [];
+  for (let i = 0; i < list.length; i++) {
+    new_list.push(mapper(list[i]));
+  }
+  return new_list;
+}
+
+let usersUnder30 = _filter(users, user => user.age < 30);
+console.log(usersUnder30);
+
+console.log(
+  _map(usersUnder30, user => user.age)
+)
+
+console.log(
+  _map(usersUnder30, bvalue('name'))
+)
+
+function bvalue(key) {
+  return function(obj) {
+    return obj[key];
+  }
+}
+
+// break id 가 3인 user
+let user;
+for (let i = 0, len = users.length; i < len; i++) {
+  if (users[i].id == 3) {
+    user = users[i];
+    break;
+  }
+}
+
+console.log(user);
+
+function _findById(list, id) {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].id == id) {
+      return list[i];
+    }
+  }
+}
+
+function _findByName(list, name) {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].name == name) {
+      return list[i];
+    }
+  }
+}
+
+function _findByAge(list, age) {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].age == age) {
+      return list[i];
+    }
+  }
+}
+
+console.log(
+  _findById(users, 3),
+  _findByName(users, 'PJ'),
+  _findByAge(users, 32)
+);
+
+function _findBy(key, list, val) {
+  for (let i = 0, len = list.length; i < len; i++) {
+    if (list[i][key] == val) {
+      return list[i];
+    }
+  }
+}
+
+console.log(
+  _findBy('age', users, 32)
+);
+
+function User(id, name, age) {
+  this.getId = function() {
+    return id;
+  }
+  this.getName = function() {
+    return name;
+  }
+  this.getAge = function() {
+    return age;
+  }
+}
+
+let users2 = [
+  new User(1, "ID", 32),
+  new User(2, "HA", 25),
+  new User(3, "BJ", 32),
+  new User(4, "PJ", 28),
+  new User(5, "JE", 27),
+  new User(6, "JM", 32),
+  new User(7, "HI", 34)
+];
+
+console.log(
+  _findBy('age', users2, 25)
+); // undifined
+
+function _find(list, predi) {
+  for (let i = 0; i < list.length; i++) {
+    if (predi(list[i])) {
+      return list[i];
+    }
+  }
+}
+
+console.clear();
+
+console.log(
+  _find(users2, function(user) {
+    return user.getAge() == 25;
+  }).getName()
+);
+
+console.log(
+  _find(users, function(user) {
+    return user.name.indexOf('P') != -1;
+  })
+);
+
+function _bmatch1(key, val) {
+  return function(obj) {
+    return obj[key] === val;
+  }
+}
+
+console.log(
+  _filter(users, _bmatch1('age', 32))
+);
+
+function _object(key, val) {
+  var obj = {};
+  obj[key] = val;
+  return obj;
+}
+
+function _match(obj, obj2) {
+  for (let key in obj2) {
+    if (obj[key] !== obj2[key]) {
+      return false;
+    }
+    return true;
+  }
+}
+
+function _bmatch(obj2, val) {
+  if (arguments.length == 2) {
+    return obj2 = _object(obj2, val);
+  }
+  return function(obj) {
+    return _match(obj, obj2);
+  }
+}
+/*
+console.log(
+  _match(
+    _find(users, _bmatch('id', 3)), 
+    _find(users, _bmatch('name', 'BJ'))
+  )
+);
+*/
+
+function _findIdnex(list, predi) {
+  for (let i = 0; i < list.length; i++) {
+    if (predi(list[i])) {
+      return i 
+    }
+  }
+  return -1;
+}
+
+console.log(
+  _findIdnex(users, function(user) {
+    return user.age == 32;
+  })
+);
+
+const _ = new Object();
+
+_.map = function(list, iter) {
+  let new_list = [];
+  for (let i = 0; i < list.length; i++) {
+    new_list.push(iter(list[i], i, list));
+  }
+  return new_list;
+}
+
+_.filter = function(list, predi) {
+  let new_list = [];
+  for (let i = 0; i < list.length; i++) {
+    if (predi(list[i], i, list)) {
+      new_list.push(list[i])
+    }
+  }
+  return new_list;
+}
+
+_.find = function(list, predi) {
+  for (let i = 0, len = list.length; i < len; i++) {
+    if (predi(list[i], i, list)) {
+      return list[i];
+    }
+  }
+}
+
+_.findIdnex = function(list, predi) {
+  for (let i = 0, len = list.length; i < len; i++) {
+    if (predi(list[i], i, list)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+console.log(
+  _.filter([1,2,3,4], function(val, idx) {
+    return idx > 1;
+  })
+)
+
+</script>
+</body>
+</html>
