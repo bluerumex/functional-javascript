@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<h1>console mode</h1>
+<script>
+var obj = { a: 1, "b": 2 };
+obj.c = 3;
+obj['d'] = 4;
+var e = 'e';
+obj[e] = 5;
+function f() { return 'f'};
+obj[f()] = 6;
+obj[7] = 7; // 숫자도 key로 사용 가능.
+
+// var obj5 = { (true ? "a" : "b") : 1 };
+// {} 안쪽에서는 코드를 실행 할 수 없고, [] 식 평가 가능.
+var obj5 = { [true ? "a" : "b"] : 1 };
+
+var obj6 = {};
+obj6[true ? "a" : "b"] = 1;
+
+// hoisting...
+
+add1(10, 5);
+
+// add2(10, 5); // Uncaught TypeError: add2 is not a function
+
+function add1(a, b) {
+  return a + b;
+}
+
+var add2 = function(a, b) {
+  return a + b;
+}
+
+console.log(add1);
+console.log(add2);
+
+/*
+function() {
+
+}
+*/
+
+
+</script>
+</body>
+</html>

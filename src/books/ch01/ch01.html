@@ -28,8 +28,12 @@
     margin-right: 10px;
     border: 1px solid red;
   }
+  .user-list {
+    margin-bottom: 10px;
+  }
 </style>
-<h1>console mode</h1>
+<h1>console mode</h1> 
+<div class="user-list"></div>
   <button>1</button>
   <button>2</button>
   <button>3</button>
@@ -369,19 +373,131 @@ let exclaim = function(statement) {
 let welcome = _.compose(greet, exclaim);
 console.log( welcome('JS') );
 
+// 흔한 클로저 실수 1-1
 var buttons = document.querySelectorAll('button');
 for (var i = 0; i < buttons.length; i++) {
   (function(user) {
-    buttons[i].addEventListener('click', function(user) {
+    buttons[i].addEventListener('click', function() {
       console.log(user.name)
     })
-  })(user[i]);
+  })(users[i]);
 }
-
+// 1-2
 var li = document.querySelectorAll('li');
 for (var i = 0; i < li.length; i++) {
   li[i].addEventListener('click', () => console.log(i))
 }
+
+$('.user-list').append(
+  _.map(users, function(user) {
+    var button = $('<button>').text(user.name);
+    button.click(function() {
+      if (confirm(user.name + '님을 팔로잉 하시겠습니까?')) {
+        follow(user);
+      }
+    });
+    return button;
+  })
+);
+
+function follow(user) {
+  $.post('/follow',
+    {user_id: user.id},
+    function() {
+      alert(`이제 ${user.name}님의 소식을 보실 수 있습니다.`);
+    }
+  );
+}
+
+function callWith(val1) {
+  return function(val2, func) {
+    return func(val1, val2);
+  }
+}
+
+var callWith10 = callWith(10);
+console.log(
+  callWith10(20, (a, b) => a + b)
+);
+
+console.log(
+  callWith([1, 2, 3])(function(v) { return v * 10}, _.map)
+);
+
+console.clear();
+
+_.get = function(list, idx) {
+  return list[idx];
+};
+
+var callWithUsers = callWith([
+  { id: 2, name: "HA", age: 25},
+  { id: 4, name: "PJ", age: 28},
+  { id: 5, name: "JE", age: 27}
+]);
+
+console.log(
+  callWithUsers(2, _.get)
+);
+
+console.log(
+  callWithUsers(function(user) {
+    return user.age > 25;
+  }, _.find)
+);
+
+console.log(
+  callWithUsers(function(user) {
+    return user.age > 25;
+  }, _.filter)
+);
+
+function add(a, b) {
+  // a -> 10, b -> 20
+  return a + b;
+}
+
+var add10 = add.bind(null, 10);
+console.log(add10(20));
+
+// bind func
+var module = {
+  x: 42,
+  getX: function() {
+    return this.x;
+  }
+};
+
+var unboundGetX = module.getX;
+console.log(`unboundGetX: ${unboundGetX()}`); // The function gets invoked at the global scope
+// expected output: undefined
+
+var boundGetX = unboundGetX.bind(module);
+console.log(boundGetX());
+
+// 존 레식
+Function.prototype.partial = function() {
+  var fn = this,
+    // fn -> abc(a, b, c);
+    args = Array.prototype.slice.call(arguments);
+    // args -> undefined, 'b', undefined
+    return function() {
+      var arg = 0;
+      for (var i = 0; i < args.length && arg < arguments.length; i++)
+        if (args[i] === undefined) args[i] = arguments[arg++];
+      return fn.apply(this, args);
+    };
+};
+
+function abc(a, b, c) {
+  console.log(a, b, c);
+}
+
+var ac = abc.partial(undefined, 'b', undefined);
+ac('a', 'c');
+
+var ac2 = abc.partial(undefined, 'b');
+ac2('a', 'c');
 
 </script>
 </body>
