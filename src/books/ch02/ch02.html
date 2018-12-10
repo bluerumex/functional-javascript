@@ -48,6 +48,119 @@ function() {
 }
 */
 
+function test(a, b, c) {
+  console.log(`test mode...`);
+  console.log(`a b c: ${a}, ${b}, ${c}`);
+  console.log(`this:`, this);
+  console.log(`arguments:`, arguments);
+}
+
+// test(10);
+// test(10, undefined);
+
+function test2(a, b) {
+  console.log(`a: ${a}, b: ${b}`);
+  b = 10;
+  console.log(b);
+  console.log(arguments);
+}
+
+// test2(1);
+// test2(1, 2);
+
+var o1 = { name: "obj1" };
+o1.test = test;
+// o1.test(3, 2, 1);
+
+var o1_test = o1.test;
+o1_test(5, 6, 7);
+
+test.apply(o1, { 0: 3, 1: 2, 2: 1, length: 3 });
+
+console.clear();
+
+// if else || && 삼항 연산자
+// ( ) 안에서는 표현식(expression)만 사용할 수 있다.
+// if ( var a = 0) console.log(a);
+// if ( function f1() {} ) console.log('hi');
+// f1(); 
+
+// 미리 선언되어 있는 변수에 값을 할당하는 것은 가능
+var a;
+if( a = 5 ) console.log(a);
+
+function add(a, b) {
+  return a + b;
+}
+
+if (add(1, 2)) console.log('hi1');
+var a;
+
+// 함수를 실행할 수 있고 실행한 결과를 변수에 담으면서 참과 거짓을 판단할 수 있다.
+if (a = add(1, 2)) console.log(a);
+
+if (function() { return true }()) console.log('hi4');
+
+// || &&
+var a = true;
+var b = false;
+
+var v1 = a || b;
+console.log(v1);
+
+var v2 = b || a;
+console.log(v2);
+
+var v3 = a && b;
+console.log(v3);
+
+var a = 'hi';
+var b = '';
+
+// a || b -> 'hi'
+// b || a -> 'hi
+// a && b -> '' // a가 긍정적인 값이어서 && 이후를 확인하게 되고 b 값이 담긴다.
+// b && a -> '' // b가 부정적인 값이어서 && 이후를 확인할 필요없이 b 값이 담긴다.
+
+console.clear();
+
+function addFriend(u1, u2) {
+  if (u1.friends.indexOf(u2) == -1) {
+    if (confirm('add friends?')) {
+      u1.friends.push(u2);
+      alert('add completed');
+    }
+  } else {
+    alert('existed');
+  }
+}
+
+var pj = { name: 'PJ', friends: [] };
+var ha = { name: 'HA', friends: [] };
+
+// console.log(addFriend(pj, ha));
+
+function addFriend2(u1, u2) {
+  (u1.friends.indexOf(u2) == -1 || alert('existed')) &&
+  confirm('add friends?') && 
+  u1.friends.push(u2) && 
+  alert('add complete');
+}
+
+// 삼항 연산자
+var a = false;
+var b = a ? 10 : 30; // 30
+
+var a = false;
+var c = a ? 10 : function f(arr, v) {
+  if (!arr.length) return v;
+  v += arr.shift();
+  return f(arr, v); 
+}([1, 2, 3], 0); // 6
+
+var c = a ? 10 : function f(arr, v) {
+  return arr.length ? f(arr, v + arr.shift()) : v
+}([1, 2, 3]); // 6
 
 </script>
 </body>
