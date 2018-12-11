@@ -168,9 +168,139 @@ var add  = function(a, b, callback) {
   }, 1000)
 };
 
+var sub  = function(a, b, callback) {
+  setTimeout(function() {
+    callback(a - b);
+  }, 1000)
+};
+
+var div  = function(a, b, callback) {
+  setTimeout(function() {
+    callback(a / b);
+  }, 1000)
+};
+
+/*
 add(10, 5, function(r) {
   console.log(r)
 });
+*/
+
+add(10, 15, function(a) {
+  sub(a, 5, function(a) {
+    div(a, 10, function(r) {
+      console.log(r);
+    });
+  });
+});
+
+/* callback 이 없다는 에러가 남
+console.log(
+  div(sub(add(10, 15), 5), 10)
+);
+*/
+
+function wrap(func) {
+  return function() {
+    func.apply(null, arguments);
+  }
+}
+
+/*
+var add = wrap(function(a, b, callback) {
+  setTimeout(function() {
+    callback(a + b)
+  }, 1000);
+});
+
+add(10, 5, function(r) {
+  console.log(r)
+});
+*/
+
+function _async(func) {
+  return function() {
+    arguments[arguments.length++] = function(result) {
+      _callback(result);
+    };
+
+    // func.apply(null, arguments);
+    // func.apply 부분 변경
+    (function wait(args) {
+      for (var i = 0; i < args.length; i++) {
+        if (args[i] && args[i].name == '_async_cb_receiver') {
+          return args[i](function(arg) { 
+            args[i] = arg;
+            wait(args);
+          });     
+        }
+      }
+      func.apply(null, args);
+    })(arguments);
+
+    var _callback;
+    function _async_cb_receiver(callback) {
+      _callback = callback;
+    }
+    return _async_cb_receiver;
+  }
+};
+
+var add = _async(function(a, b, callback) {
+  setTimeout(function() {
+    console.log('add', a, b);
+    callback(a + b);
+  }, 1000);
+});
+
+/*
+add(20, 30)(function(r) {
+  console.log(r);
+});
+*/
+
+var sub = _async(function(a, b, callback) {
+  setTimeout(function() {
+    console.log('sub', a, b);
+    callback(a - b);
+  }, 1000);
+});
+
+var div = _async(function(a, b, callback) {
+  setTimeout(function() {
+    console.log('div', a, b);
+    callback(a / b);
+  }, 1000);
+});
+
+var log = _async(function(val) {
+  setTimeout(function() {
+    console.log(`log... : ${val}`)
+  }, 1000)
+});
+
+log(div(sub(add(10, 15), 5), 10));
+
+/* 
+add(10, 15)(function(a) {
+  sub(a, 5)(function(a) {
+    div(a, 10)(function(r) {
+      console.log(r);
+    })
+  })
+}); 
+*/
+
+function log(arg) {
+  console.log(arg);
+}
+
+// ((a, b) => (f => f(f)) (f => log(a) || a++ == f(f)))(1, 5);
+
+var start = f => f(f);
+var logger = (a, b) => start(f => log(a) || a++ == b || f(f));
+
+logger(1, 5);
 </script>
 </body>
 </html>
