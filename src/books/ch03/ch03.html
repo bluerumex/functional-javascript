@@ -9,5 +9,182 @@
 </head>
 <body>
 <h1>console mode</h1>
+<script>
+console.clear();
+const _ = {};
+
+/*
+_.map = function(list, iteratee) {
+  var new_list = [];
+  for (var i = 0, len = list.length; i < len; i++) {
+    new_list.push(iteratee(list[i], i, list));
+  }
+  return new_list;
+}
+*/
+
+var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+function getLength(list) {
+  return list == null ? void 0 : list.length; // void 0의 결과는 undefined
+}
+
+var isArrayLike = function(list) {
+  var length = getLength(list);
+  return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+}
+
+/* _.map */
+_.map = function(data, iteratee) {
+  var new_list = [];
+  if (isArrayLike(data)) {
+    for (var i = 0, len = data.length; i < len; i++) {
+      new_list.push(iteratee(data[i], i, data))
+    }
+  } else {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        new_list.push(iteratee(data[key], key, data))
+      }
+    }
+  }
+  return new_list;
+}
+
+console.log(
+  _.map([1, 2, 3], function(v) {
+    return v * 2
+  })
+);
+
+console.log(
+  _.map({ a: 1, b: 2, c: 3}, v => v * 2)
+);
+
+console.log(
+  _.map([1, 2, 3], function(v) {
+    return v * this;
+  }.bind(5))
+);
+
+_.identity = function(v) {
+  return v;
+}
+
+_.idtt = _.identity;
+_.values = function(list) {
+  return _.map(list, _.identity);
+}
+
+_.args0 = _.identity;
+_.args1 = function(a, b) {
+  return b;
+}
+
+_.keys = function(list) {
+  return _.map(list, _.args1)
+}
+
+console.log(
+  _.keys([3, 2, 1]),
+  _.keys({ id: 5, name: "JE", age: 27 })
+);
+
+/* _.each */
+_.each = function(data, iteratee) {
+  if (isArrayLike(data)) {
+    for (var i = 0, len = data.length; i < len; i++) {
+      iteratee(data[i], i, data);
+    }
+  } else {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        iteratee(data[key], key, data);
+      }
+    }
+  }
+  return data;
+}
+
+function bloop(new_data, body) {
+  return function(data, iteratee) {
+    var result = new_data(data);
+    if (isArrayLike(data)) {
+      for (var i = 0, len = data.length; i < len; i++) {
+        body(iteratee(data[i], i, data), result);
+      }
+    } else {
+      for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+          body(iteratee(data[key], key, data), result);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+_.map = bloop(function() {
+  return [];
+}, function(val, obj) {
+  return obj.push(val);
+});
+
+_.each = bloop(function(v) {
+  return v;
+}, function() {});
+
+bloop(
+  function(v) { return v },
+  function() {}
+)(
+  [5, 6, 7],
+  function(v) { console.log(v) }
+);
+
+_.array = function() { return [] };
+_.push_to = function(val, obj) {
+  obj.push(val);
+  return val;
+};
+_.noop = function() {};
+
+_.map = bloop(_.array, _.push_to);
+_.each = bloop(_.identity, _.noop);
+
+
+function rankings(arr){
+  let result = [];
+  let rank = null;
+  
+  for (let i = 0, len = arr.length; i < len; i++) {
+    rank = len;
+    for (let j = 0; j < len; j++) {
+      arr[i] > arr[j] ? --rank : rank;
+    }
+    result.push(rank);
+  }
+  
+  return result;
+}
+console.clear();
+console.log(rankings2([1,3,2])); // 3, 1, 2
+// 3, 1, 2
+function rankings2(arr) {
+  /* 
+  console.log([...arr].sort((a, b) => {
+    console.log(`a: ${a}, b: ${b}`);
+    console.log(`b - a: `, b - a);
+    return b - a;
+  })
+  */
+  const sorted = [...arr].sort( (a, b) => b - a ); 
+  // [1, 3, 2] -> [3, 2, 1]
+  const ranked = [...arr].map( (item) => sorted.indexOf(item) + 1 );
+  // item -> 1, 3, 2
+  return ranked;
+};
+
+console.log(_.keys({ name: 'PJ' }));
+</script>
 </body>
 </html>
