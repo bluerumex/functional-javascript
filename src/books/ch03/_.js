@@ -41,6 +41,8 @@ _.identity = function(v) {
   return v;
 };
 
+_.idtt = _.identity;
+
 _.values = function(list) {
   return _.map(list, _.identity);
 };
@@ -101,22 +103,21 @@ _.filter = function(data, predicate) {
   return result;
 }
 
-console.log(
-  _.filter([1, 2, 3, 4], function(val) {
-    return val  > 2;
-  })
-)
-
-function bloop(new_data, body) {
+function bloop(new_data, body, stopper) {
   return function(data, iter_predi) {
     var result = new_data(data);
+    var memo;
     if (isArrayLike(data)) {
       for (var i = 0, len = data.length; i < len; i++) {
-        body(iter_predi(data[i], i, data), result, data[i]);
+        memo = iter_predi(data[i], i, data);
+        if (!stopper) body(memo, result, data[i], i);
+        else if (stopper(memo)) return body(memo, result, data[i], i);
       }
     } else {
       for (var i = 0, keys = _.keys(data), len = keys.length; i< len; i++) {
-        body(iter_predi(data[keys[i]], keys[i], data), result, data[keys[i]]);
+        memo = iter_predi(data[keys[i]], keys[i], data);
+        if (!stopper) body(memo, result, data[keys[i]], keys[i])
+        else if (stopper(memo)) body(memo, result, data[keys[i]], keys[i]);
       }
     }
     return result;
@@ -154,6 +155,28 @@ function sum(a, b, c, d) {
   return (a || 0) + (b || 0) + (c || 0) + (d || 0);
 }
 
+_.if = function(validator, func, alter) {
+  return function() {
+    return validator.apply(null, arguments) ? 
+      func.apply(null, arguments) : 
+      alter && alter.apply(null, arguments);
+  }
+};
+
+_.push = function(obj, val) {
+  obj.push(val);
+  return obj;
+};
+
+_.filter = bloop(_.array, _.if(_.idtt, _.rester(_.push)));
+
+_.not = function(v) { return !v };
+
+_.reject = bloop(_.array, _.if(_.not, _.rester(_.push)));
+
 console.log(
-  _.rester(sum)(1, 2, 3, 4)
+  _.reject([1,2,3,4], function(val) {
+    return val < 2;
+  })
 );
+
