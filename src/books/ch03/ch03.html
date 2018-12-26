@@ -151,23 +151,6 @@ _.noop = function() {};
 _.map = bloop(_.array, _.push_to);
 _.each = bloop(_.identity, _.noop);
 
-
-function rankings(arr){
-  let result = [];
-  let rank = null;
-  
-  for (let i = 0, len = arr.length; i < len; i++) {
-    rank = len;
-    for (let j = 0; j < len; j++) {
-      arr[i] > arr[j] ? --rank : rank;
-    }
-    result.push(rank);
-  }
-  
-  return result;
-}
-console.clear();
-console.log(_.keys({ name: 'PJ' }));
 </script>
 </body>
 </html>

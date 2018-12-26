@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>CH04</title>
+  <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+  <script src="../ch03/_.js"></script>
+</head>
+<body>
+<h1>console mode</h1>
+
+<ul class="list">
+  <li>아이템<button>삭제</button></li>
+  <li>아이템<button>삭제</button></li>
+  <li>아이템<button>삭제</button></li>
+</ul>
+
+<div class="box" style="position: relative; background: red; width: 50x; height:50px;"></div>
+<script>
+
+_.once = function(func) {
+  var flag, result;
+  return function() {
+    if (flag) return result;
+    flag = true;
+    return result = func.apply(this, arguments);
+  }
+};
+
+function skip(body) {
+  var yes;
+  return function() {
+    return yes || (yes = body.apply(null, arguments));
+  }
+}
+
+var confirmRemove = skip(function() {
+  return confirm('삭제 버튼을 누르면 아이템이 삭제됩니다. 다시 물어보지 않을게요.');
+});
+
+$('.list').on('click', 'li button', function(e) {
+  confirmRemove() && $(e.currentTarget).closest('li').remove();
+});
+
+var method = function(method) {
+  var args = _.rest(arguments);
+  return function(obj) {
+    return obj[method].apply(obj, args.concat(_.rest(arguments)));
+  }
+};
+
+var bg = method('css', 'background-color');
+var $box = $('.box');
+console.log( bg($box) );
+bg($box, 'yellow');
+
+var x = 'xxx';
+
+function foo() {
+  var y = 'yyy';
+
+  function bar() {
+    var z = 'zzz';
+    console.log(x + y + z);
+  }
+
+  bar();
+}
+
+foo();
+
+</script>
+</body>
+</html>

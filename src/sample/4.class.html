@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Class</title>
+</head>
+<body>
+<script>
+  // ES5
+  var Person = (function() {
+    // Constructor
+    function Person(name) {
+      this._name = name;
+    }
+
+    // public method
+    Person.prototype.sayHi = function() {
+      console.log('Hi ' + this._name);
+    }
+
+    return Person;
+  }());
+
+  var me = new Person('Yoon');
+  me.sayHi();
+
+  /* #1. 클래스 정의 */
+
+  class Person2 {
+    constructor(name) {
+      this._name = name;
+    }
+
+    sayHi() {
+      console.log(`Hi ${this._name}`);
+    }
+  }
+
+  const me2 = new Person2('sw');
+  me2.sayHi();
+
+  /* 
+  표현식으로 클래스를 정의할 수 있다.
+  const Foo = class MyClass {};
+  const foo = new Foo();
+
+  console.log(foo); // MyClass {}
+
+  new MyClass(); // ReferenceError: MyClass is not defined
+  */
+
+  class Foo {
+    constructor(num) {
+      this._num = num;
+    };
+
+  };
+  const foo = new Foo(1);
+  console.log(Foo === Foo.prototype.constructor);
+
+  class Foo5 {
+    constructor(arr = []) {
+      this._arr = arr;
+    }
+
+    // getter
+    get firstElem() {
+      // 반드시 무언가를 반환해야한다.
+      return this._arr.length ? this._arr[0] : null;
+    }
+
+    set firstElem(elem) {
+      this._arr = [elem, ...this._arr];
+    }
+  }
+
+  const foo5 = new Foo5([1, 2]);
+  console.log(foo5.firstElem); // 1
+  foo5.firstElem = 100;
+  console.log(foo5.firstElem); // 100
+
+  class Foo6 {
+    constructor(prop) {
+      this.prop = prop;
+    }
+
+    static staticMethod() {
+      /* 
+      정적 메소드는 this를 사용할 수 없다.
+      정적 메소드 내부에서 this는 클래스의 인스턴스가 아닌 클래스 자신을 가리킨다.
+      */
+      return 'staticMethod';
+    }
+
+    prototypeMethod() {
+      return this.prop;
+    }
+  }
+  
+  // 정적 메소드는 클래스 이름으로 호출한다.
+  console.log(Foo6.staticMethod());
+
+  const foo6 = new Foo6(123);
+  // 정적 메소드는 인스턴스로 호출할 수 없다.
+  // console.log(foo6.staticMethod()); // uncaught TypeError: foo.staticMethod is not a function
+
+  var Foo7 = (function() {
+    // 생성자 함수
+    function Foo7(prop) {
+      this.prop = prop;
+    }
+
+    Foo7.staticMethod = function () {
+      return 'staticMethod';
+    }
+
+    Foo7.prototype.prototypeMethod = function () {
+      return this.prop;
+    }
+
+    return Foo7;
+  }());
+
+  var foo7 = new Foo7(123);
+  console.log(Foo7.staticMethod());
+  // console.log(foo7.staticMethod()); // Uncaught TypeError: Cannot read property 'staticMethod' of undefined
+
+  //부모 클래스
+  class Circle {
+    constructor(radius) {
+      this._radius = radius; // 반지름
+    }
+
+    // 원의 지름
+    getDiameter() {
+      return 2 * this._radius;
+    }
+
+    // 원의 둘레
+    getPrimeter() {
+      return 2 * Math.PI * this._radius;
+    }
+
+    // 원의 넓이
+    getArea() {
+      return Math.PI * Math.pow(this._radius, 2);
+    }
+  }
+
+  // 자식 클래스
+  class Cylinder extends Circle {
+    constructor(radius, height) {
+      super(radius);
+      this._height = height;
+    }
+
+    // 원통의 넓이: 부모 클래스의 getArea 메소드를 오버라이딩하였다.
+    getArea() {
+      // (원통의 높이 * 원의 둘레) + (2 * 원의 넓이)
+      return (this._height * super.getPrimeter()) + (2 * super.getArea());
+    }
+
+    // 원통의 부피
+    getVolume() {
+      return super.getArea() * this._height;
+    }
+  }
+
+  // 반지름이 2, 높이가 10인 원통
+  const cylinder = new Cylinder(2, 10);
+
+  // 원의 지름
+  console.log(cylinder.getDiameter()); // 4
+
+  // 원의 둘레
+  console.log(cylinder.getPrimeter()); // 12.566370614359172
+
+  // 원통의 넓이
+  console.log(cylinder.getArea()); // 150.7964473....
+
+  // 원통의 부피
+  console.log(cylinder.getVolume()); // 125.6637006143...
+
+  // cylinder는 Cylinder 클래스의 인스턴스이다.
+  console.log(cylinder instanceof Cylinder); // true
+
+  // cylinder는 Circle 클래스의 인스턴스이다
+  console.log(cylinder instanceof Circle); // true
+
+  /* 
+  class Parent {}
+
+  class Child extends Parent {
+    constructor() {} // ReferenceError: this is not defined
+  }
+
+  const child = new Child(); 
+  */
+
+</script>
+</body>
+</html>
